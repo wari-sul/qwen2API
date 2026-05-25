@@ -215,6 +215,7 @@ def translate_frontend():
             "# Gemini 格式": "# Gemini format",
         },
         "pages/TokensPage.tsx": {
+            "删除失败": "Delete failed",
             "刷新失败，请检查会话 Key": "Refresh failed, check your session key",
             "已生成新的 API Key": "New API Key generated",
             "生成失败，请检查权限": "Generation failed, check permissions",
