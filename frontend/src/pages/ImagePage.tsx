@@ -52,7 +52,7 @@ export default function ImagePage() {
       if (!res.ok) {
         const detail = data?.detail || data?.error || `HTTP ${res.status}`
         setError(String(detail))
-        toast.error(`生成失败: ${String(detail).slice(0, 80)}`)
+        toast.error(`Generation failed: ${String(detail).slice(0, 80)}`)
         return
       }
 
@@ -63,17 +63,17 @@ export default function ImagePage() {
       }))
 
       if (newImages.length === 0) {
-        setError("未返回图片，请重试")
-        toast.error("未返回图片，请重试")
+        setError("No images returned, please retry")
+        toast.error("No images returned, please retry")
         return
       }
 
       setImages(prev => [...newImages, ...prev])
-      toast.success(`成功生成 ${newImages.length} 张图片`)
+      toast.success(`Generated ${newImages.length} images`)
     } catch (err: any) {
-      const msg = err.message || "网络错误"
+      const msg = err.message || "Network error"
       setError(msg)
-      toast.error(`生成失败: ${msg}`)
+      toast.error(`Generation failed: ${msg}`)
     } finally {
       setLoading(false)
     }
@@ -91,32 +91,32 @@ export default function ImagePage() {
   return (
     <div className="space-y-6 max-w-5xl">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">图片生成</h2>
-        <p className="text-muted-foreground">通过 Qwen3.6-Plus 生成 AI 图片，支持多种比例。</p>
+        <h2 className="text-2xl font-bold tracking-tight">Image Generation</h2>
+        <p className="text-muted-foreground">Generate AI images via Qwen3.6-Plus. Multiple aspect ratios supported.</p>
       </div>
 
       {/* 输入区域 */}
       <div className="rounded-xl border bg-card shadow-sm p-6 space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium">图片描述 (Prompt)</label>
+          <label className="text-sm font-medium">Image Prompt</label>
           <textarea
             rows={3}
             value={prompt}
             onChange={e => setPrompt(e.target.value)}
-            placeholder="描述你想生成的图片，例如：赛博朋克风格的猫咪，霓虹灯背景，超写实风格"
+            placeholder="Describe the image, e.g.: cyberpunk cat, neon background, ultra-realistic"
             className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             disabled={loading}
             onKeyDown={e => {
               if (e.key === "Enter" && e.ctrlKey) handleGenerate()
             }}
           />
-          <p className="text-xs text-muted-foreground">Ctrl+Enter 快速生成</p>
+          <p className="text-xs text-muted-foreground">Ctrl+Enter to generate</p>
         </div>
 
         <div className="flex flex-wrap gap-4 items-end">
           {/* 比例选择 */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">图片比例</label>
+            <label className="text-sm font-medium">Aspect Ratio</label>
             <div className="flex gap-2">
               {ASPECT_RATIOS.map(r => (
                 <button
@@ -137,7 +137,7 @@ export default function ImagePage() {
 
           {/* 数量选择 */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">生成数量</label>
+            <label className="text-sm font-medium">Count</label>
             <div className="flex gap-2">
               {[1, 2, 4].map(v => (
                 <button
@@ -150,7 +150,7 @@ export default function ImagePage() {
                   }`}
                   disabled={loading}
                 >
-                  {v} 张
+                  {v}
                 </button>
               ))}
             </div>
@@ -168,8 +168,8 @@ export default function ImagePage() {
             className="ml-auto h-10 px-6 gap-2"
           >
             {loading
-              ? <><RefreshCw className="h-4 w-4 animate-spin" /> 生成中...</>
-              : <><Wand2 className="h-4 w-4" /> 生成图片</>
+              ? <><RefreshCw className="h-4 w-4 animate-spin" /> Generating...</>
+              : <><Wand2 className="h-4 w-4" /> Generate</>
             }
           </Button>
         </div>
@@ -191,8 +191,8 @@ export default function ImagePage() {
               <RefreshCw className="h-6 w-6 animate-spin absolute -bottom-1 -right-1 text-primary" />
             </div>
             <div className="text-center">
-              <p className="font-medium">正在生成图片...</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">图片生成通常需要 10-30 秒，请耐心等待</p>
+              <p className="font-medium">Generating image...</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">Image generation typically takes 10–30 seconds.</p>
             </div>
           </div>
         </div>
@@ -202,9 +202,9 @@ export default function ImagePage() {
       {images.length > 0 && !loading && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold">生成结果 ({images.length} 张)</h3>
+            <h3 className="font-semibold">Results ({images.length})</h3>
             <Button variant="ghost" size="sm" onClick={() => setImages([])}>
-              清空
+              Clear
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -223,7 +223,7 @@ export default function ImagePage() {
                     }}
                   />
                   <div className="hidden items-center justify-center p-8 text-muted-foreground text-sm">
-                    <ImageIcon className="h-8 w-8 mr-2" /> 图片加载失败
+                    <ImageIcon className="h-8 w-8 mr-2" /> Image failed to load
                   </div>
                   {/* 悬浮操作栏 */}
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
@@ -233,14 +233,14 @@ export default function ImagePage() {
                       onClick={() => handleDownload(img.url, idx)}
                       className="gap-1.5"
                     >
-                      <Download className="h-3.5 w-3.5" /> 下载
+                      <Download className="h-3.5 w-3.5" /> Download
                     </Button>
                     <Button
                       size="sm"
                       variant="secondary"
                       onClick={() => window.open(img.url, "_blank")}
                     >
-                      在新窗口打开
+                      Open in new tab
                     </Button>
                   </div>
                 </div>
@@ -263,8 +263,8 @@ export default function ImagePage() {
           <div className="flex flex-col items-center gap-4 text-muted-foreground">
             <ImageIcon className="h-16 w-16 text-muted-foreground/20" />
             <div className="text-center">
-              <p className="font-medium">还没有生成图片</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">在上方输入描述，点击「生成图片」开始创作</p>
+              <p className="font-medium">No images yet</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">Enter a prompt above and click Generate.</p>
             </div>
           </div>
         </div>
