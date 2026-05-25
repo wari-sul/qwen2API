@@ -1,0 +1,36 @@
+name: Auto-Maintain Fork
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  maintain-codebase:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1 
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run Maintenance Script
+        run: python .github/agents/maintain_fork.py
+
+      - name: Commit and Push Changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(agent): auto-translate UI, strip bloat, and apply Coolify README [skip ci]"
+          commit_user_name: "GitHub Actions Bot"
+          commit_user_email: "actions@github.com"
+          file_pattern: "frontend/src/**/*.tsx frontend/src/**/*.ts backend/requirements.txt README.md docker-compose.build.yml .github/workflows/"
