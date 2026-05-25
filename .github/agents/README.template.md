@@ -40,7 +40,6 @@ A high-performance gateway converting chat.qwen.ai web access into OpenAI, Anthr
 | `ADMIN_KEY` | `admin` | **Must change!** Master password for the WebUI. |
 | `PORT` | `7860` | Pre-configured by agent. |
 | `WORKERS` | `1` | Pre-configured by agent. |
-| `ENGINE_MODE` | `hybrid` | Use `hybrid` or `browser` to bypass Aliyun WAF. `httpx` mode will be blocked. |
 
 ### Concurrency & Rate Limiting
 | Variable | Default | Notes |
