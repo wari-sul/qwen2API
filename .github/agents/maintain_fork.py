@@ -1,5 +1,6 @@
 import os
 import shutil
+import re
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 FRONTEND_SRC_DIR = os.path.join(ROOT_DIR, "frontend", "src")
@@ -20,8 +21,38 @@ def strip_oss2():
                 f.write(line)
     print("Stripped 'oss2' from requirements.txt")
 
+def remove_upstream_workflows():
+    """Removes upstream workflows that conflict with the Coolify fork deployment."""
+    docker_workflow = os.path.join(ROOT_DIR, ".github", "workflows", "docker-publish.yml")
+    if os.path.exists(docker_workflow):
+        os.remove(docker_workflow)
+        print("Removed upstream docker-publish.yml to prevent CI failures.")
+
+def patch_compose_file():
+    """Merges build context with full runtime config for Coolify, preserving Dockerfile paths."""
+    compose_path = os.path.join(ROOT_DIR, "docker-compose.yml")
+    build_compose_path = os.path.join(ROOT_DIR, "docker-compose.build.yml")
+    
+    if not os.path.exists(compose_path):
+        return
+        
+    with open(compose_path, "r", encoding="utf-8") as f:
+        content = f.read()
+        
+    # Replaces the `image:` line with the robust build block while preserving indentation
+    patched_content = re.sub(
+        r'^(\s*)image:\s*.*$', 
+        r'\1build:\n\1  context: .\n\1  dockerfile: Dockerfile', 
+        content, 
+        flags=re.MULTILINE
+    )
+    
+    with open(build_compose_path, "w", encoding="utf-8") as f:
+        f.write(patched_content)
+    print("Patched docker-compose.build.yml with full runtime config.")
+
 def translate_frontend():
-    """Translates UI using exact string and Unicode matching, sorted by length to prevent substring corruption."""
+    """Translates UI using exact string and Unicode matching, sorted by length."""
     translation_map = {
         "layouts/AdminLayout.tsx": {
             '"运行状态"': '"Status"',
@@ -57,7 +88,6 @@ def translate_frontend():
             "`每账号目标 ${pool.target_per_account}  · TTL ${Math.round((pool.ttl_seconds || 0) / 60)} 分钟`": "`target per acc ${pool.target_per_account} · TTL ${Math.round((pool.ttl_seconds || 0) / 60)} min`",
         },
         "pages/AccountsPage.tsx": {
-            # Standard Literals
             "账号管理": "Account Management",
             "管理通义千问上游账号池。": "Manage the upstream Qwen account pool.",
             "刷新状态": "Refresh",
@@ -72,8 +102,6 @@ def translate_frontend():
             "登录后，": "after logging in,",
             "复制其值粘贴到下方。": "Copy the value and paste it below.",
             "暂无账号数据": "No accounts found",
-            
-            # Critical Unicode Escapes & Template Literals
             r"\u9a8c\u8bc1\u5931\u8d25\uff1a${statusText(data) || localizeError(data.error)}": "Verification failed: ${statusText(data) || localizeError(data.error)}",
             r"\u6fc0\u6d3b\u5931\u8d25\uff1a${localizeError(data.error || data.message)}": "Activation failed: ${localizeError(data.error || data.message)}",
             r"\u6fc0\u6d3b\u8bf7\u6c42\u5931\u8d25": "Activation request failed",
@@ -249,9 +277,7 @@ def translate_frontend():
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
             
-        # Sort keys by length descending to mathematically prevent substring corruption
         sorted_keys = sorted(replacements.keys(), key=len, reverse=True)
-        
         for cn_str in sorted_keys:
             en_str = replacements[cn_str]
             content = content.replace(cn_str, en_str)
@@ -262,16 +288,18 @@ def translate_frontend():
     print("Frontend UI translated to English.")
 
 def rewrite_readme():
-    """Deterministically overwrites the README with the Coolify template."""
+    """Deterministically overwrites the Chinese README with the English Coolify template."""
     if not os.path.exists(TEMPLATE_README):
         print("Template README not found, skipping rewrite.")
         return
     shutil.copyfile(TEMPLATE_README, README_FILE)
-    print("README.md deterministically rewritten for Coolify ops.")
+    print("README.md replaced with English Coolify template.")
 
 if __name__ == "__main__":
     print("Starting automated fork maintenance...")
     strip_oss2()
+    remove_upstream_workflows()
+    patch_compose_file()
     translate_frontend()
     rewrite_readme()
     print("Maintenance complete.")
