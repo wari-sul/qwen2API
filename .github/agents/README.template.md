@@ -31,20 +31,21 @@ A high-performance gateway converting chat.qwen.ai web access into OpenAI, Anthr
 ---
 
 ## Environment Variables (.env)
-You **must** configure these in the Coolify UI before deploying.
+
+**PORT and WORKERS are pre-configured in `docker-compose.build.yml` by the automated maintenance agent. You only need to set `ADMIN_KEY` in the Coolify environment UI.**
 
 ### Core Configuration
 | Variable | Default | Notes |
 |---|---|---|
-| `ADMIN_KEY` | `change-me-now` | **Must change!** Master password for the WebUI. |
-| `PORT` | `7860` | Do not change. |
-| `WORKERS` | `1` | **Must remain 1.** Multiple workers will corrupt JSON files. |
+| `ADMIN_KEY` | `admin` | **Must change!** Master password for the WebUI. |
+| `PORT` | `7860` | Pre-configured by agent. |
+| `WORKERS` | `1` | Pre-configured by agent. |
 | `ENGINE_MODE` | `hybrid` | Use `hybrid` or `browser` to bypass Aliyun WAF. `httpx` mode will be blocked. |
 
 ### Concurrency & Rate Limiting
 | Variable | Default | Notes |
 |---|---|---|
-| `BROWSER_POOL_SIZE` | `2` | Number of Camoufox pages. Higher = more RAM used. |
+| `BROWSER_POOL_SIZE` | `1` | Number of Camoufox pages. Higher = more RAM used. |
 | `MAX_INFLIGHT` | `2` | Max concurrent requests per upstream account. |
 | `ACCOUNT_MIN_INTERVAL_MS`| `0` | Minimum ms between requests for the same account. |
 | `RATE_LIMIT_BASE_COOLDOWN`| `600` | Base cooldown in seconds if an account hits a 429 WAF block. |
