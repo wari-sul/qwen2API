@@ -33,4 +33,4 @@ jobs:
           commit_message: "chore(agent): auto-translate UI, strip bloat, and apply Coolify README [skip ci]"
           commit_user_name: "GitHub Actions Bot"
           commit_user_email: "actions@github.com"
-          file_pattern: "frontend/src/**/*.tsx frontend/src/**/*.ts backend/requirements.txt README.md .github/workflows/"
+          file_pattern: "frontend/src/**/*.tsx frontend/src/**/*.ts backend/requirements.txt README.md docker-compose.build.yml .github/workflows/"
